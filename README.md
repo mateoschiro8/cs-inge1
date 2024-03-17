@@ -1,2 +1,1 @@
-# cs-inge1
-Ingeniería de software 1 - 1c2024
+Repo de ingeniería de software 1 - 1c2024

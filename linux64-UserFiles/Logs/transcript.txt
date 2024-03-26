@@ -60,3 +60,24 @@
 2024-03-22T14:30:59.667 process:40 1295269 IIII
 2024-03-22T14:31:01.927 process:79 876403 IIIII
 2024-03-22T14:31:01.928 process:79 876403 ----QUIT----(22 March 2024 14:31:01) CuisUniversity-6169.image priorSource: 6288475
+2024-03-25T21:00:49.167 process:40 576704 Editor shortcut: $e already taken for: methodSourceContainingIt:. Override request for: acceptSendAndInspect:  ignored
+2024-03-25T21:31:27.866 process:40 2173658 Editor shortcut: $e already taken for: methodSourceContainingIt:. Override request for: acceptSendAndInspect:  ignored
+2024-03-25T21:58:45.003 process:79 1967905 
+2024-03-25T21:58:45.005 process:79 1967905 ----SNAPSHOT----(25 March 2024 21:58:44) CuisUniversity-6169.image priorSource: 6290321
+2024-03-25T21:58:50.083 process:40 1652754 
+2024-03-25T21:58:50.107 process:40 1652754 I
+2024-03-25T21:58:50.130 process:40 1652754 II
+2024-03-25T21:58:50.142 process:40 1652754 III
+2024-03-25T21:58:50.156 process:40 1652754 IIII
+2024-03-25T21:58:50.170 process:40 1652754 IIIII
+2024-03-25T21:59:53.908 process:40 1652754 IIIIIIEditor shortcut: $e already taken for: methodSourceContainingIt:. Override request for: acceptSendAndInspect:  ignored
+2024-03-25T22:00:02.587 process:79 2014614 
+2024-03-25T22:00:02.588 process:79 2014614 ----SNAPSHOT----(25 March 2024 22:00:02) CuisUniversity-6169.image priorSource: 6300692
+2024-03-25T22:00:07.883 process:40 3804603 
+2024-03-25T22:00:07.902 process:40 3804603 I
+2024-03-25T22:00:07.920 process:40 3804603 II
+2024-03-25T22:00:07.928 process:40 3804603 III
+2024-03-25T22:00:07.937 process:40 3804603 IIII
+2024-03-25T22:00:07.950 process:40 3804603 IIIII
+2024-03-25T22:00:14.785 process:79 3984398 IIIIII
+2024-03-25T22:00:14.786 process:79 3984398 ----QUIT----(25 March 2024 22:00:14) CuisUniversity-6169.image priorSource: 6303247

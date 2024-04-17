@@ -1,9 +1,9 @@
-!classDefinition: #NumeroTest category: #'Numero-Exercise'!
+!classDefinition: #NumeroTest category: #'Numeros-Resolucion'!
 TestCase subclass: #NumeroTest
 	instanceVariableNames: 'zero one two four oneFifth oneHalf five twoFifth twoTwentyfifth fiveHalfs three eight negativeOne negativeTwo'
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'Numero-Exercise'!
+	category: 'Numeros-Resolucion'!
 
 !NumeroTest methodsFor: 'tests' stamp: 'HernanWilkinson 5/7/2016 20:11'!
 test01isCeroReturnsTrueWhenAskToZero
@@ -287,12 +287,12 @@ setUp
 	! !
 
 
-!classDefinition: #Numero category: #'Numero-Exercise'!
+!classDefinition: #Numero category: #'Numeros-Resolucion'!
 Object subclass: #Numero
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'Numero-Exercise'!
+	category: 'Numeros-Resolucion'!
 
 !Numero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 22:48'!
 * aMultiplier
@@ -342,7 +342,7 @@ isZero
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Numero class' category: #'Numero-Exercise'!
+!classDefinition: 'Numero class' category: #'Numeros-Resolucion'!
 Numero class
 	instanceVariableNames: ''!
 
@@ -357,12 +357,12 @@ invalidNumberTypeErrorDescription
 	^ 'Tipo de número inválido!!!!!!'! !
 
 
-!classDefinition: #Entero category: #'Numero-Exercise'!
+!classDefinition: #Entero category: #'Numeros-Resolucion'!
 Numero subclass: #Entero
 	instanceVariableNames: 'value enterOo'
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'Numero-Exercise'!
+	category: 'Numeros-Resolucion'!
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 21:48:37'!
 * aMultiplier 
@@ -578,7 +578,7 @@ seMultiplicaConLaFraccion: aFraccionMultiplier
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Entero class' category: #'Numero-Exercise'!
+!classDefinition: 'Entero class' category: #'Numeros-Resolucion'!
 Entero class
 	instanceVariableNames: ''!
 
@@ -595,12 +595,12 @@ with: aValue
 	^self new initalizeWith: aValue! !
 
 
-!classDefinition: #Fraccion category: #'Numero-Exercise'!
+!classDefinition: #Fraccion category: #'Numeros-Resolucion'!
 Numero subclass: #Fraccion
 	instanceVariableNames: 'numerator denominator'
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'Numero-Exercise'!
+	category: 'Numeros-Resolucion'!
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 21:49:50'!
 * aMultiplier 
@@ -820,7 +820,7 @@ seMultiplicaConLaFraccion: aFraccionMultiplier
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Fraccion class' category: #'Numero-Exercise'!
+!classDefinition: 'Fraccion class' category: #'Numeros-Resolucion'!
 Fraccion class
 	instanceVariableNames: ''!
 

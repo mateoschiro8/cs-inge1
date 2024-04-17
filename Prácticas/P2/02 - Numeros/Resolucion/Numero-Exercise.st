@@ -364,14 +364,10 @@ Numero subclass: #Entero
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 11:30:43'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 21:48:37'!
 * aMultiplier 
 
-	(aMultiplier isKindOf: Entero)
-			ifTrue: [^self multiplicarEnteroConEntero: aMultiplier].
-	
-	(aMultiplier isKindOf: Fraccion)		
-			ifTrue: [ ^self multiplicarEnteroConFraccion: aMultiplier]
+	^ aMultiplier seMultiplicaConElEntero: self.
 
 	"(aMultiplier isKindOf: Entero)
 			ifTrue: [^self class with: value * aMultiplier integerValue].
@@ -384,16 +380,12 @@ Numero subclass: #Entero
 				
 					^ newNumerator / newDenominator ]."! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 11:19:32'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 21:34:20'!
 + anAdder 
 		
-	(anAdder isKindOf: Entero)
-			ifTrue: [^self sumarEnteroConEntero: anAdder].
-	
-	(anAdder isKindOf: Fraccion)		
-			ifTrue: [^self sumarEnteroConFraccion: anAdder ]. 
-	
-	" (anAdder isKindOf: Entero)
+	^anAdder seLeSumaElEntero: self
+		
+	"(anAdder isKindOf: Entero)
 			ifTrue: [^self class with: value + anAdder integerValue].
 	
 	(anAdder isKindOf: Fraccion)		
@@ -404,14 +396,10 @@ Numero subclass: #Entero
 				
 					^ newNumerator / newDenominator ]. "! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 11:29:51'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 21:37:27'!
 - aSubtrahend 
 	
-	(aSubtrahend isKindOf: Entero)
-			ifTrue: [^ self restarEnteroConEntero: aSubtrahend ].
-	
-	(aSubtrahend isKindOf: Fraccion)		
-			ifTrue: [ ^ self restarEnteroConFraccion: aSubtrahend  ].
+	^aSubtrahend seLeRestaAlEntero: self.
 	
 	"(aSubtrahend isKindOf: Entero)
 			ifTrue: [^ self class with: value - aSubtrahend integerValue.].
@@ -424,14 +412,10 @@ Numero subclass: #Entero
 
 					^ newNumerator / newDenominator  ]."! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 11:38:40'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 21:57:22'!
 / aDivisor 
 	
-	(aDivisor isKindOf: Entero)
-			ifTrue: [^ self dividirEnteroConEntero: aDivisor ].
-	
-	(aDivisor isKindOf: Fraccion)		
-			ifTrue: [ ^ self dividirEnteroConFraccion: aDivisor ]
+	^aDivisor divideAlEntero: self.
 	
 	"(aDivisor isKindOf: Entero)
 			ifTrue: [^Fraccion with: self over: aDivisor].
@@ -480,11 +464,11 @@ hash
 	^value hash! !
 
 
-!Entero methodsFor: 'initialization' stamp: 'MS 4/12/2024 16:34:52'!
+!Entero methodsFor: 'initialization' stamp: 'MS 4/15/2024 21:08:40'!
 initalizeWith: aValue 
 	
 	value := aValue.
-	enterOo := EnteroConEntero new! !
+	! !
 
 
 !Entero methodsFor: 'value' stamp: 'HernanWilkinson 5/7/2016 21:02'!
@@ -517,34 +501,71 @@ isZero
 	^value = 0! !
 
 
-!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:35:56'!
-dividirEnteroConEntero: anIntegerDivisor
-	
-	^Fraccion with: self over: anIntegerDivisor
-
-	! !
-
-!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:36:57'!
-dividirEnteroConFraccion: aFraccionDivisor
+!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:59:11'!
+divideALaFraccion: aFraccionDivisor
 	
 	| newNumerator newDenominator |
 					
-	newNumerator := (self * aFraccionDivisor denominator).
-	newDenominator := aFraccionDivisor numerator.
+	newNumerator := aFraccionDivisor numerator.
+	newDenominator := (self * aFraccionDivisor denominator).
 
 	^ Fraccion with: newNumerator over: newDenominator 
 
 	! !
 
-!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:28:15'!
-multiplicarEnteroConEntero: anIntegerMultiplier
+!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:54:15'!
+divideAlEntero: anIntegerDivisor
+	
+	^Fraccion with: anIntegerDivisor over: self
+
+	! !
+
+!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:43:35'!
+seLeRestaALaFraccion: aFractionMinuend 
+	
+	| newNumerator newDenominator |
+	
+	newNumerator := (aFractionMinuend numerator - (self * aFractionMinuend denominator)).
+	newDenominator := aFractionMinuend denominator.
+
+	^ newNumerator / newDenominator
+	! !
+
+!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:37:27'!
+seLeRestaAlEntero: anIntegerMinuend 
+	
+	^ self class with: anIntegerMinuend integerValue - value.
+	
+
+	! !
+
+!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:34:39'!
+seLeSumaElEntero: anIntegerAdder
+
+	^self class with: anIntegerAdder integerValue + value
+
+	! !
+
+!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:35:32'!
+seLeSumaLaFraccion: aFractionAdder
+
+	| newNumerator newDenominator |
+					
+	newNumerator := (self * aFractionAdder denominator + aFractionAdder numerator).
+	newDenominator := aFractionAdder denominator.
+
+	^ newNumerator / newDenominator
+	! !
+
+!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:47:08'!
+seMultiplicaConElEntero: anIntegerMultiplier
 	
 	^self class with: value * anIntegerMultiplier integerValue
 
 	! !
 
-!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:28:46'!
-multiplicarEnteroConFraccion: aFraccionMultiplier
+!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:49:06'!
+seMultiplicaConLaFraccion: aFraccionMultiplier
 	
 	| newNumerator newDenominator |
 					
@@ -552,47 +573,6 @@ multiplicarEnteroConFraccion: aFraccionMultiplier
 	newDenominator := aFraccionMultiplier denominator.
 
 	^ newNumerator / newDenominator
-
-	! !
-
-!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:26:47'!
-restarEnteroConEntero: anIntegerSubtrahend 
-	
-	^ self class with: value - anIntegerSubtrahend integerValue.
-	
-
-	! !
-
-!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:27:10'!
-restarEnteroConFraccion: anIntegerSubtrahend 
-	
-	| newNumerator newDenominator |
-					
-	newNumerator := (self * (anIntegerSubtrahend denominator) - (anIntegerSubtrahend numerator)).
-	newDenominator := anIntegerSubtrahend denominator.
-
-	^ newNumerator / newDenominator
-
-	! !
-
-!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:19:37'!
-sumarEnteroConEntero: anIntegerAdder 
-	
-	^self class with: value + anIntegerAdder integerValue
-	
-
-	! !
-
-!Entero methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:19:24'!
-sumarEnteroConFraccion: aFraccionAdder 
-	
-	| newNumerator newDenominator |
-					
-	newNumerator := (self * aFraccionAdder denominator + aFraccionAdder numerator).
-	newDenominator := aFraccionAdder denominator.
-
-	^ newNumerator / newDenominator
-	
 
 	! !
 
@@ -615,32 +595,6 @@ with: aValue
 	^self new initalizeWith: aValue! !
 
 
-!classDefinition: #One category: #'Numero-Exercise'!
-Entero subclass: #One
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numero-Exercise'!
-
-!One methodsFor: 'as yet unclassified' stamp: 'MS 4/15/2024 11:54:54'!
-fibonacci
-
-	^ 1! !
-
-
-!classDefinition: #Zero category: #'Numero-Exercise'!
-Entero subclass: #Zero
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numero-Exercise'!
-
-!Zero methodsFor: 'as yet unclassified' stamp: 'MS 4/15/2024 11:55:00'!
-fibonacci
-
-	^ 1! !
-
-
 !classDefinition: #Fraccion category: #'Numero-Exercise'!
 Numero subclass: #Fraccion
 	instanceVariableNames: 'numerator denominator'
@@ -648,14 +602,10 @@ Numero subclass: #Fraccion
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 11:33:12'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 21:49:50'!
 * aMultiplier 
 	
-	(aMultiplier isKindOf: Entero)
-			ifTrue: [ ^ self multiplicarFraccionConEntero: aMultiplier ].
-	
-	(aMultiplier isKindOf: Fraccion)		
-			ifTrue: [  ^ self multiplicarFraccionConFraccion: aMultiplier ].
+	^ aMultiplier seMultiplicaConLaFraccion: self.
 			
 	" (aMultiplier isKindOf: Entero)
 			ifTrue: [		| newNumerator newDenominator |
@@ -673,14 +623,10 @@ Numero subclass: #Fraccion
 				
 					^ newNumerator / newDenominator ]. "! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 11:22:57'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 21:35:32'!
 + anAdder 
 	
-	(anAdder isKindOf: Entero)
-			ifTrue: [^ self sumarFraccionConEntero: anAdder].
-	
-	(anAdder isKindOf: Fraccion)		
-			ifTrue: [^ self sumarFraccionConEntero: anAdder ] 
+	^anAdder seLeSumaLaFraccion: self
 		
 	"(anAdder isKindOf: Entero)
 			
@@ -694,14 +640,10 @@ Numero subclass: #Fraccion
 					
 					^newNumerator / newDenominator ] "! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 11:26:09'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 21:38:41'!
 - aSubtrahend 
 
-	(aSubtrahend isKindOf: Entero)
-			ifTrue: [ ^ self restarFraccionConEntero: aSubtrahend ].
-	
-	(aSubtrahend isKindOf: Fraccion)		
-			ifTrue: [ ^ self restarFraccionConFraccion: aSubtrahend ]
+	^ aSubtrahend seLeRestaALaFraccion: self.
 		
 	" (aSubtrahend isKindOf: Entero)
 			ifTrue: [| newNumerator newDenominator |
@@ -722,14 +664,10 @@ Numero subclass: #Fraccion
 	
 ! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 11:40:31'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 21:57:34'!
 / aDivisor 
 			
-	(aDivisor isKindOf: Entero)
-			ifTrue: [^self dividirFraccionConEntero: aDivisor].
-	
-	(aDivisor isKindOf: Fraccion)		
-			ifTrue: [^self dividirFraccionConFraccion: aDivisor]
+	^aDivisor divideALaFraccion: self
 			
 	"(aDivisor isKindOf: Entero)
 			ifTrue: [^Fraccion with: numerator over: aDivisor * denominator].
@@ -801,23 +739,66 @@ printOn: aStream
 		print: denominator ! !
 
 
-!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:39:13'!
-dividirFraccionConEntero: anIntegerDivisor 
-	
-	^Fraccion with: numerator over: anIntegerDivisor * denominator! !
-
-!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:39:43'!
-dividirFraccionConFraccion: aFraccionDivisor 
+!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:58:25'!
+divideALaFraccion: aFraccionDivisor 
 	
 	| newNumerator newDenominator |
 					
-	newNumerator := (numerator * aFraccionDivisor denominator).
-	newDenominator := (denominator * aFraccionDivisor numerator).
+	newNumerator := (denominator * aFraccionDivisor numerator).
+	newDenominator := (numerator * aFraccionDivisor denominator).
 
 	^ Fraccion with: newNumerator over: newDenominator! !
 
-!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:31:24'!
-multiplicarFraccionConEntero: anIntegerMultiplier 
+!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:55:19'!
+divideAlEntero: anIntegerDivisor 
+	
+	^Fraccion with: anIntegerDivisor * denominator over: numerator ! !
+
+!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:41:53'!
+seLeRestaALaFraccion: aFraccionMinuend 
+	
+	| newNumerator newDenominator |
+	
+	newNumerator := (aFraccionMinuend numerator * denominator) - (aFraccionMinuend denominator * numerator).
+	newDenominator := denominator * aFraccionMinuend denominator.
+	
+	^newNumerator / newDenominator
+	
+	! !
+
+!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:37:27'!
+seLeRestaAlEntero: anIntegerMinuend 
+	
+	| newNumerator newDenominator |
+					
+	newNumerator := (anIntegerMinuend * (self denominator) - (self numerator)).
+	newDenominator := self denominator.
+
+	^ newNumerator / newDenominator
+	
+	
+	! !
+
+!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:34:39'!
+seLeSumaElEntero: anIntegerAdder 
+	
+	^(denominator * anIntegerAdder + numerator) / denominator.
+	
+	! !
+
+!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:35:32'!
+seLeSumaLaFraccion: aFractionAdder 
+	
+	| newNumerator newDenominator |
+					
+	newNumerator := (numerator * aFractionAdder denominator) + (denominator * aFractionAdder numerator).
+	newDenominator := denominator * aFractionAdder denominator.
+	
+	^newNumerator / newDenominator .
+	! !
+
+!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:49:28'!
+seMultiplicaConElEntero: anIntegerMultiplier 
 	
 	| newNumerator newDenominator |
 					
@@ -827,8 +808,8 @@ multiplicarFraccionConEntero: anIntegerMultiplier
 	^ newNumerator / newDenominator
 	! !
 
-!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:32:06'!
-multiplicarFraccionConFraccion: aFraccionMultiplier 
+!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 21:50:02'!
+seMultiplicaConLaFraccion: aFraccionMultiplier 
 	
 	 | newNumerator newDenominator |
 					
@@ -836,48 +817,6 @@ multiplicarFraccionConFraccion: aFraccionMultiplier
 	newDenominator := (denominator * aFraccionMultiplier denominator).
 
 	^ newNumerator / newDenominator	! !
-
-!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:24:19'!
-restarFraccionConEntero: anIntegerSubtrahend 
-	
-	| newNumerator newDenominator |
-	
-	newNumerator := (numerator - (anIntegerSubtrahend * denominator)).
-	newDenominator := denominator.
-
-	^ newNumerator / newDenominator
-	
-	! !
-
-!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:25:10'!
-restarFraccionConFraccion: aFraccionSubtrahend 
-	
-	| newNumerator newDenominator |
-	
-	newNumerator := (numerator * aFraccionSubtrahend denominator) - (denominator * aFraccionSubtrahend numerator).
-	newDenominator := denominator * aFraccionSubtrahend denominator.
-	
-	^newNumerator / newDenominator
-	
-	! !
-
-!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:20:24'!
-sumarFraccionConEntero: anIntegerAdder 
-	
-	^(denominator * anIntegerAdder + numerator) / denominator.
-	
-	! !
-
-!Fraccion methodsFor: 'arithmetic operations methods' stamp: 'MS 4/15/2024 11:21:24'!
-sumarFraccionConFraccion: aFraccionAdder 
-	
-	| newNumerator newDenominator |
-					
-	newNumerator := (numerator * aFraccionAdder denominator) + (denominator * aFraccionAdder numerator).
-	newDenominator := denominator * aFraccionAdder denominator.
-	
-	^newNumerator / newDenominator .
-	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -903,80 +842,3 @@ with: aDividend over: aDivisor
 
 	^self new initializeWith: numerator over: denominator
 	! !
-
-
-!classDefinition: #Operaciones category: #'Numero-Exercise'!
-Object subclass: #Operaciones
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numero-Exercise'!
-
-
-!classDefinition: #EnteroS category: #'Numero-Exercise'!
-Operaciones subclass: #EnteroS
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numero-Exercise'!
-
-!EnteroS methodsFor: 'as yet unclassified' stamp: 'MS 4/12/2024 16:27:04'!
-add: anAdder to: aNumber
-
-	self subclassResponsibility ! !
-
-
-!classDefinition: #EnteroConEntero category: #'Numero-Exercise'!
-EnteroS subclass: #EnteroConEntero
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numero-Exercise'!
-
-!EnteroConEntero methodsFor: 'as yet unclassified' stamp: 'MS 4/12/2024 16:25:23'!
-add: anAdder to: anInteger
-
-	^ Entero with: (anInteger integerValue + anAdder integerValue)! !
-
-
-!classDefinition: #EnteroConFraccion category: #'Numero-Exercise'!
-EnteroS subclass: #EnteroConFraccion
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numero-Exercise'!
-
-
-!EnteroConFraccion methodsFor: 'as yet unclassified' stamp: 'MS 4/12/2024 16:26:28'!
-add: aFraction to: anInteger
-
-	 | newNumerator newDenominator |
-					
-	newNumerator := (anInteger * aFraction denominator + aFraction numerator).
-	newDenominator := aFraction denominator.
-
-	^ newNumerator / newDenominator! !
-
-
-!classDefinition: #FraccionS category: #'Numero-Exercise'!
-Operaciones subclass: #FraccionS
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numero-Exercise'!
-
-
-!classDefinition: #FraccionConEntero category: #'Numero-Exercise'!
-FraccionS subclass: #FraccionConEntero
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numero-Exercise'!
-
-
-!classDefinition: #FraccionConFraccion category: #'Numero-Exercise'!
-FraccionS subclass: #FraccionConFraccion
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numero-Exercise'!

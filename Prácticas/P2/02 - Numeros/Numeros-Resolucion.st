@@ -359,7 +359,7 @@ invalidNumberTypeErrorDescription
 
 !classDefinition: #Entero category: #'Numeros-Resolucion'!
 Numero subclass: #Entero
-	instanceVariableNames: 'value enterOo'
+	instanceVariableNames: 'value'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Numeros-Resolucion'!
@@ -433,19 +433,10 @@ Numero subclass: #Entero
 	
 	^self class with: value // aDivisor integerValue! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'MS 4/15/2024 12:00:02'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'MS 4/17/2024 14:46:30'!
 fibonacci
 
-	| one two |
-	
-	one := Entero with: 1.
-	two := Entero with: 2.
-	
-	self isNegative ifTrue: [self error: Entero negativeFibonacciErrorDescription ].	
-	(self isZero or: [self isOne]) ifTrue: [^one].
-	
-	^ (self - one) fibonacci + (self - two) fibonacci
-		! !
+	self subclassResponsibility ! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:00'!
 greatestCommonDivisorWith: anEntero 
@@ -464,11 +455,11 @@ hash
 	^value hash! !
 
 
-!Entero methodsFor: 'initialization' stamp: 'MS 4/15/2024 21:08:40'!
+!Entero methodsFor: 'initialization' stamp: 'MS 4/17/2024 14:37:59'!
 initalizeWith: aValue 
 	
 	value := aValue.
-	! !
+! !
 
 
 !Entero methodsFor: 'value' stamp: 'HernanWilkinson 5/7/2016 21:02'!
@@ -586,13 +577,113 @@ Entero class
 negativeFibonacciErrorDescription
 	^ ' Fibonacci no está definido aquí para Enteros Negativos!!!!!!'! !
 
-!Entero class methodsFor: 'instance creation' stamp: 'HernanWilkinson 5/7/2016 22:53'!
+!Entero class methodsFor: 'instance creation' stamp: 'MS 4/17/2024 14:40:06'!
 with: aValue 
 	
 	"Esta verificacion esta puesta por si se equivocan y quieren crear un Entero pasando otra cosa que un Integer - Hernan"
 	aValue isInteger ifFalse: [  self error: 'aValue debe ser anInteger' ].
 	
-	^self new initalizeWith: aValue! !
+	"^self new initalizeWith: aValue"
+		
+	aValue < 0
+		ifTrue: [ ^ Negativo new initalizeWith: aValue].
+	
+	aValue = 0
+		ifTrue: [ ^ Cero new initalizeWith: aValue.]. 
+		
+	aValue = 1
+		ifTrue: [ ^ Uno new initalizeWith: aValue.]. 
+	
+	aValue > 1
+		ifTrue: [ ^ MayorQueUno new initalizeWith: aValue.].! !
+
+
+!classDefinition: #Cero category: #'Numeros-Resolucion'!
+Entero subclass: #Cero
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Resolucion'!
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'MS 4/18/2024 11:28:11'!
+creaUnaFraccionSiPuedeDividirA: numerator
+
+	"Busca solo una clase para arriba si no entiende un mensaje?"
+
+	self error: Numero canNotDivideByZeroErrorDescription! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'MS 4/17/2024 14:45:44'!
+fibonacci
+
+	^ Entero with: 1.
+		! !
+
+
+!classDefinition: #MayorQueUno category: #'Numeros-Resolucion'!
+Entero subclass: #MayorQueUno
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Resolucion'!
+
+!MayorQueUno methodsFor: 'as yet unclassified' stamp: 'MS 4/18/2024 11:28:11'!
+creaUnaFraccionSiPuedeDividirA: numerator
+
+	| greatestCommonDivisor newNumerator newDenominator |
+
+	greatestCommonDivisor := numerator greatestCommonDivisorWith: self. 
+	newNumerator := numerator // greatestCommonDivisor.
+	newDenominator := self // greatestCommonDivisor.
+	
+	newDenominator isOne ifTrue: [ ^newNumerator ].
+
+	^Fraccion new initializeWith: newNumerator over: newDenominator! !
+
+!MayorQueUno methodsFor: 'as yet unclassified' stamp: 'MS 4/17/2024 14:44:02'!
+fibonacci
+
+	 | one two |
+	
+	one := Entero with: 1.
+	two := Entero with: 2.
+	
+	^ (self - one) fibonacci + (self - two) fibonacci! !
+
+
+!classDefinition: #Negativo category: #'Numeros-Resolucion'!
+Entero subclass: #Negativo
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Resolucion'!
+
+!Negativo methodsFor: 'as yet unclassified' stamp: 'MS 4/18/2024 11:28:11'!
+creaUnaFraccionSiPuedeDividirA: numerator
+
+	^numerator negated / self negated! !
+
+!Negativo methodsFor: 'as yet unclassified' stamp: 'MS 4/17/2024 14:44:17'!
+fibonacci
+
+	self error: Entero negativeFibonacciErrorDescription! !
+
+
+!classDefinition: #Uno category: #'Numeros-Resolucion'!
+Entero subclass: #Uno
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Resolucion'!
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'MS 4/18/2024 11:27:27'!
+creaUnaFraccionSiPuedeDividirA: numerator
+
+	^numerator! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'MS 4/17/2024 14:45:49'!
+fibonacci
+
+	^ Entero with: 1.! !
 
 
 !classDefinition: #Fraccion category: #'Numeros-Resolucion'!
@@ -824,12 +915,15 @@ seMultiplicaConLaFraccion: aFraccionMultiplier
 Fraccion class
 	instanceVariableNames: ''!
 
-!Fraccion class methodsFor: 'intance creation' stamp: 'NR 9/23/2018 23:45:19'!
+!Fraccion class methodsFor: 'intance creation' stamp: 'MS 4/18/2024 11:28:12'!
 with: aDividend over: aDivisor
 
-	| greatestCommonDivisor numerator denominator |
+	^ aDivisor creaUnaFraccionSiPuedeDividirA: aDividend. 	
+
+	"| greatestCommonDivisor numerator denominator |
 	
 	aDivisor isZero ifTrue: [ self error: self canNotDivideByZeroErrorDescription ].
+
 	aDividend isZero ifTrue: [ ^aDividend ].
 	
 	aDivisor isNegative ifTrue:[ ^aDividend negated / aDivisor negated].
@@ -840,5 +934,5 @@ with: aDividend over: aDivisor
 	
 	denominator isOne ifTrue: [ ^numerator ].
 
-	^self new initializeWith: numerator over: denominator
+	^self new initializeWith: numerator over: denominator "
 	! !

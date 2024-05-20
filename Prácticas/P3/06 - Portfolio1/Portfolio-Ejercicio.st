@@ -187,6 +187,26 @@ test11NoSePuedeAgregarCuentaAPortfolioQueYaLaContiene
 	        withExceptionDo: [ :anError |
 	            self assert: anError messageText = Portfolio accountOrPortfolioAlreadyInPortfolioErrorDescription ]! !
 
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MS 5/16/2024 20:47:15'!
+test12NoSePuedeAgregarPortfolioAPortfolioQueYaContieneUnaDeSusCuentas
+
+	| portfolio1 portfolio2 account deposit |
+	
+	account := ReceptiveAccount new.
+	deposit := Deposit register: 100 on: account.
+	
+	portfolio1 := Portfolio new. 
+	portfolio1 add: account.
+	
+	portfolio2 := Portfolio new. 
+	portfolio2 add: account.
+	
+	self
+	        should: [ portfolio1 add: portfolio2.]
+	        raise: Error 
+	        withExceptionDo: [ :anError |
+	            self assert: anError messageText = Portfolio accountOrPortfolioAlreadyInPortfolioErrorDescription ]! !
+
 
 !classDefinition: #ReceptiveAccountTest category: #'Portfolio-Ejercicio'!
 TestCase subclass: #ReceptiveAccountTest
@@ -265,7 +285,7 @@ test06ReceptiveAccountDoNotKnowNotRegisteredTransactions
 	self deny: (account hasRegistered:withdraw).
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'MS 5/16/2024 12:36:38'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'MS 5/16/2024 20:35:58'!
 test07AccountKnowsItsTransactions 
 
 	| account1 deposit1 |
@@ -275,7 +295,7 @@ test07AccountKnowsItsTransactions
 	deposit1 := Deposit register: 50 on: account1.
 		
 	self assert: 1 equals: account1 transactions size.
-	self assert: (account1 transactions includesOrIs: deposit1).
+	self assert: (account1 transactions includes: deposit1).
 ! !
 
 
@@ -286,8 +306,8 @@ Object subclass: #AccountTransaction
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!AccountTransaction methodsFor: 'value' stamp: 'MS 5/16/2024 11:07:10'!
-effectOnBalance
+!AccountTransaction methodsFor: 'value' stamp: 'MS 5/16/2024 20:39:06'!
+effectOnBalance: aPartialBalance
 
 	self subclassResponsibility! !
 
@@ -326,10 +346,10 @@ initializeFor: aValue
 	value := aValue ! !
 
 
-!Deposit methodsFor: 'value' stamp: 'MS 5/16/2024 11:07:21'!
-effectOnBalance 
+!Deposit methodsFor: 'value' stamp: 'MS 5/16/2024 20:39:16'!
+effectOnBalance: aPartialBalance
 
-	^ self value! !
+	^ aPartialBalance + self value! !
 
 !Deposit methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:38'!
 value
@@ -361,10 +381,10 @@ initializeFor: aValue
 	value := aValue ! !
 
 
-!Withdraw methodsFor: 'value' stamp: 'MS 5/16/2024 11:07:33'!
-effectOnBalance 
+!Withdraw methodsFor: 'value' stamp: 'MS 5/16/2024 20:39:30'!
+effectOnBalance: aPartialBalance
 
-	^ self value * -1 ! !
+	^ aPartialBalance - self value! !
 
 !Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:33'!
 value
@@ -383,19 +403,68 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
+!classDefinition: #FinancialEntity category: #'Portfolio-Ejercicio'!
+Object subclass: #FinancialEntity
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!FinancialEntity methodsFor: 'balance' stamp: 'MS 5/16/2024 21:14:25'!
+balance
+
+	self subclassResponsibility! !
+
+!FinancialEntity methodsFor: 'balance' stamp: 'MS 5/16/2024 21:14:42'!
+isAlreadyIncludedIn: anAccountsAndPortfoliosSet
+
+	self subclassResponsibility! !
+
+
+!FinancialEntity methodsFor: 'testing' stamp: 'MS 5/16/2024 21:14:32'!
+hasRegistered: aTransaction
+
+	self subclassResponsibility! !
+
+
+!FinancialEntity methodsFor: 'validations' stamp: 'MS 5/16/2024 21:14:36'!
+checkIfIsAlreadyIncluded: anAccountOrPortfolio
+
+	self subclassResponsibility! !
+
+
+!FinancialEntity methodsFor: 'transactions' stamp: 'MS 5/16/2024 21:14:52'!
+transactions
+
+	self subclassResponsibility! !
+
+
 !classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
-Object subclass: #Portfolio
+FinancialEntity subclass: #Portfolio
 	instanceVariableNames: 'accountsAndPortfolios'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!Portfolio methodsFor: 'accounts' stamp: 'MS 5/16/2024 12:36:38'!
+!Portfolio methodsFor: 'accounts' stamp: 'MS 5/16/2024 21:03:45'!
 add: anAccountOrPortfolio
 	
-	(self includesOrIs: anAccountOrPortfolio)
-		ifFalse: [accountsAndPortfolios add: anAccountOrPortfolio]
-		ifTrue: [self error: self class accountOrPortfolioAlreadyInPortfolioErrorDescription].! !
+	self assertThatItIsntYetInPortfolio: anAccountOrPortfolio.
+		
+	accountsAndPortfolios add: anAccountOrPortfolio
+		! !
+
+!Portfolio methodsFor: 'accounts' stamp: 'MS 5/16/2024 21:15:43'!
+assertThatItIsntYetInPortfolio: anAccountOrPortfolio
+
+	^ (self checkIfIsAlreadyIncluded: anAccountOrPortfolio)
+		ifTrue: [self error: self class accountOrPortfolioAlreadyInPortfolioErrorDescription]! !
+
+!Portfolio methodsFor: 'accounts' stamp: 'MS 5/16/2024 21:00:01'!
+checkIfIsAlreadyIncluded: anAccountOrPortfolio
+
+	^ anAccountOrPortfolio isAlreadyIncludedIn: accountsAndPortfolios 
+! !
 
 !Portfolio methodsFor: 'accounts' stamp: 'MS 5/16/2024 12:16:15'!
 hasRegistered: aTransaction
@@ -403,23 +472,10 @@ hasRegistered: aTransaction
 	^ accountsAndPortfolios inject: false into: [ :anAccum :anAccount | (anAccount hasRegistered: aTransaction) | anAccum ]
 	! !
 
-!Portfolio methodsFor: 'accounts' stamp: 'MS 5/16/2024 12:36:43'!
-includesOrIs: anAccountOrPortfolio
-
-	^ accountsAndPortfolios inject: false into: [ :anAccum :currentAccountOrPortfolio | (currentAccountOrPortfolio includesOrIs: anAccountOrPortfolio ) | anAccum ]! !
-
-!Portfolio methodsFor: 'accounts' stamp: 'MS 5/16/2024 12:16:15'!
+!Portfolio methodsFor: 'accounts' stamp: 'MS 5/16/2024 21:29:56'!
 transactions
 	
-	| aTransactionsSet |
-	
-	aTransactionsSet := Set new.
-	
-	accountsAndPortfolios do: [:anAccount | aTransactionsSet addAll: (anAccount transactions asSet)].
-	
-	^ aTransactionsSet 
-	
-	"^ accounts inject: (Set new) into: [:aTransactionsSet :anAccount | aTransactionsSet addAll: (anAccount transactions asSet)]"! !
+	^ accountsAndPortfolios inject: (Set new) into: [ :aTransactionsSet :anAccount | aTransactionsSet addAll: (anAccount transactions asSet); yourself]! !
 
 
 !Portfolio methodsFor: 'initialization' stamp: 'MS 5/16/2024 12:16:15'!
@@ -433,6 +489,11 @@ balance
 		
 	^ accountsAndPortfolios sum: [:anAccountOrPortfolio | anAccountOrPortfolio balance] ifEmpty: [0].! !
 
+!Portfolio methodsFor: 'balance' stamp: 'MS 5/16/2024 21:00:01'!
+isAlreadyIncludedIn: anAccountsAndPortfoliosSet 
+
+	^ anAccountsAndPortfoliosSet inject: false into: [ :anAccum :currentAccountOrPortfolio | (self checkIfIsAlreadyIncluded: currentAccountOrPortfolio)  | anAccum]! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: #'Portfolio-Ejercicio'!
@@ -444,9 +505,10 @@ accountOrPortfolioAlreadyInPortfolioErrorDescription
 	
 	^ 'Esa cuenta o portfolio ya está agregada'! !
 
+
 
 !classDefinition: #ReceptiveAccount category: #'Portfolio-Ejercicio'!
-Object subclass: #ReceptiveAccount
+FinancialEntity subclass: #ReceptiveAccount
 	instanceVariableNames: 'transactions'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -470,10 +532,13 @@ transactions
 	^ transactions copy! !
 
 
-!ReceptiveAccount methodsFor: 'balance' stamp: 'MS 5/16/2024 11:07:43'!
+!ReceptiveAccount methodsFor: 'balance' stamp: 'MS 5/16/2024 21:13:33'!
 balance
 
-	^transactions sum: [ :aTransaction | aTransaction effectOnBalance ] ifEmpty: [ 0 ]! !
+	^ transactions inject: 0 into: [ :balanceParcial :aTransaction | (aTransaction effectOnBalance: balanceParcial)] 
+
+	
+	! !
 
 
 !ReceptiveAccount methodsFor: 'testing' stamp: 'MS 5/16/2024 12:43:57'!
@@ -483,7 +548,12 @@ hasRegistered: aTransaction
 ! !
 
 
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'MS 5/16/2024 12:37:13'!
-includesOrIs: anAccountOrPortfolio 
+!ReceptiveAccount methodsFor: 'validations' stamp: 'MS 5/16/2024 21:00:01'!
+checkIfIsAlreadyIncluded: anAccountOrPortfolio 
 	
 	^ self = anAccountOrPortfolio ! !
+
+!ReceptiveAccount methodsFor: 'validations' stamp: 'MS 5/16/2024 21:00:01'!
+isAlreadyIncludedIn: anAccountsAndPortfoliosSet 
+
+	^ anAccountsAndPortfoliosSet inject: false into: [ :anAccum :currentAccountOrPortfolio | (currentAccountOrPortfolio checkIfIsAlreadyIncluded: self ) | anAccum]! !

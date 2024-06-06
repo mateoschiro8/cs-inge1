@@ -134,83 +134,75 @@ test01CanNotCheckOutEmptyCart
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Cashier emptyCartErrorMessage.]! !
 
-!CashierTest methodsFor: 'testing' stamp: 'MS 6/4/2024 12:40:59'!
+!CashierTest methodsFor: 'testing' stamp: 'MS 6/6/2024 11:41:43'!
 test02CartWithOneItemChecksOutCorrectly
 
 	| cashier cart creditCard |
 	
-	cart := Cart acceptingItemsOf: self defaultItemList.
+	cart := (Cart acceptingItemsOf: self defaultItemList) add: 'Crimen y Castigo'.
 	creditCard := self validCreditCard.
-	
-	cart add: 'Crimen y Castigo'.
-	
 	cashier := Cashier forCart: cart withCreditCard: creditCard usingPrices: self defaultPriceList andMerchant: MerchantSimulator acceptingAllCards.
 	
 	self assert: cashier checkout equals: 200.! !
 
-!CashierTest methodsFor: 'testing' stamp: 'MS 6/4/2024 12:41:24'!
+!CashierTest methodsFor: 'testing' stamp: 'MS 6/6/2024 11:41:18'!
 test03CartWithManyItemsChecksOutCorrectly
 
 	| cashier cart creditCard |
 	
-	cart := Cart acceptingItemsOf: self defaultItemList.
+	cart := self cartWith2ItemsAndDefaultPrices .
 	creditCard := self validCreditCard.
-	
-	cart add: 'Crimen y Castigo'; add: 'El Codigo Da Vinci'.
-	
 	cashier := Cashier forCart: cart withCreditCard: creditCard usingPrices: self defaultPriceList andMerchant: MerchantSimulator acceptingAllCards.
 	
 	self assert: cashier checkout equals: 350.! !
 
-!CashierTest methodsFor: 'testing' stamp: 'MS 6/4/2024 12:41:31'!
+!CashierTest methodsFor: 'testing' stamp: 'MS 6/6/2024 11:41:03'!
 test04CanNotCheckoutWithCardThatDoesNotHave16Digits
 
-	| cart creditCard |
+	| cart |
 	
-	cart := Cart acceptingItemsOf: self defaultItemList.
-	creditCard := self invalidCreditCardWrongNumberSize.
-	
-	cart add: 'Crimen y Castigo'; add: 'El Codigo Da Vinci'.
+	cart := self cartWith2ItemsAndDefaultPrices.
 	
 	self 
-		should: [ Cashier forCart: cart withCreditCard: creditCard usingPrices: self defaultPriceList andMerchant: MerchantSimulator acceptingAllCards.]
+		should: [ Cashier forCart: cart 
+						withCreditCard: self invalidCreditCardWrongNumberSize
+						usingPrices: self defaultPriceList 
+						andMerchant: MerchantSimulator acceptingAllCards.]		
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
-			self assert: anError messageText = Cashier wrongCreditCardNumberErrorMessage.]
+			self assert: anError messageText = CreditCard wrongCreditCardNumberErrorMessage.]
 	
 
 	
 	! !
 
-!CashierTest methodsFor: 'testing' stamp: 'MS 6/4/2024 12:41:37'!
+!CashierTest methodsFor: 'testing' stamp: 'MS 6/6/2024 11:40:57'!
 test05CanNotCheckoutWithCardThatDoesNotHave3DigitsInCVV
 
-	| cart creditCard |
+	| cart |
 	
-	cart := Cart acceptingItemsOf: self defaultItemList.
-	creditCard := self invalidCreditCardWrongCVVSize.
-	
-	cart add: 'Crimen y Castigo'; add: 'El Codigo Da Vinci'.
+	cart := self cartWith2ItemsAndDefaultPrices.
 	
 	self 
-		should: [ Cashier forCart: cart withCreditCard: creditCard usingPrices: self defaultPriceList andMerchant: MerchantSimulator acceptingAllCards.]
+		should: [ Cashier forCart: cart 
+						withCreditCard: self invalidCreditCardWrongCVVSize
+						usingPrices: self defaultPriceList 
+						andMerchant: MerchantSimulator acceptingAllCards.]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
-			self assert: anError messageText = Cashier wrongCreditCardCVVErrorMessage.]
+			self assert: anError messageText = CreditCard wrongCreditCardCVVErrorMessage.]
 	
 
 	
 	! !
 
-!CashierTest methodsFor: 'testing' stamp: 'MS 6/4/2024 12:41:40'!
+!CashierTest methodsFor: 'testing' stamp: 'MS 6/6/2024 11:45:40'!
 test06CanNotCheckoutWithExpiredCard
 
 	| cart creditCard |
 	
-	cart := Cart acceptingItemsOf: self defaultItemList.
+	cart := self cartWith2ItemsAndDefaultPrices.
 	creditCard := self expiredCreditCard.
-	
-	cart add: 'Crimen y Castigo'; add: 'El Codigo Da Vinci'.
 	
 	self 
 		should: [ Cashier forCart: cart withCreditCard: creditCard usingPrices: self defaultPriceList andMerchant: MerchantSimulator acceptingAllCards.]
@@ -222,16 +214,13 @@ test06CanNotCheckoutWithExpiredCard
 	
 	! !
 
-!CashierTest methodsFor: 'testing' stamp: 'MS 6/4/2024 12:48:22'!
+!CashierTest methodsFor: 'testing' stamp: 'MS 6/6/2024 11:40:43'!
 test07CanNotCheckoutWithCardWithoutEnoughFounds
 
 	| cart creditCard cashier |
 	
-	cart := Cart acceptingItemsOf: self defaultItemList.
+	cart := self cartWith2ItemsAndDefaultPrices.
 	creditCard := self validCreditCard.
-	
-	cart add: 'Crimen y Castigo'; add: 'El Codigo Da Vinci'.
-	
 	cashier := Cashier forCart: cart withCreditCard: creditCard usingPrices: self defaultPriceList andMerchant: MerchantSimulator rejectingAllCards.
 	
 	self 
@@ -244,6 +233,53 @@ test07CanNotCheckoutWithCardWithoutEnoughFounds
 	
 	! !
 
+!CashierTest methodsFor: 'testing' stamp: 'MS 6/6/2024 11:57:51'!
+test08CanNotCheckoutWithCardWithWrongNameSize
+
+	| cart |
+	
+	cart := self cartWith2ItemsAndDefaultPrices.
+	
+	self 
+		should: [ Cashier forCart: cart 
+						withCreditCard: self invalidCreditCardWrongNameSize
+						usingPrices: self defaultPriceList 
+						andMerchant: MerchantSimulator acceptingAllCards.]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = CreditCard wrongOwnerSizeErrorMessage .]
+	
+
+	
+	! !
+
+!CashierTest methodsFor: 'testing' stamp: 'MS 6/6/2024 12:10:16'!
+test09CanNotCheckoutTransactionWithMoreThan15Digits
+
+	| cart cashier |
+	
+	cart := (Cart acceptingItemsOf: self expensiveItemList) add: 'Un libro muy caro'; add: 'La gota que rebalsó el cajero'.
+	cashier := Cashier forCart: cart 
+					withCreditCard: self validCreditCard 
+					usingPrices: self expensivePriceList 
+					andMerchant: MerchantSimulator acceptingAllCards.
+	self 
+		should: [ cashier checkout ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Cashier transactionAmountLimitExceededErrorMessage .]
+	
+
+	
+	! !
+
+
+!CashierTest methodsFor: 'support' stamp: 'MS 6/6/2024 11:40:32'!
+cartWith2ItemsAndDefaultPrices.
+
+	^ (Cart acceptingItemsOf: self defaultItemList) add: 'Crimen y Castigo'; add: 'El Codigo Da Vinci'.
+	
+	! !
 
 !CashierTest methodsFor: 'support' stamp: 'MS 6/4/2024 11:21:04'!
 defaultItemList
@@ -258,51 +294,48 @@ defaultPriceList
 		at: 'El Codigo Da Vinci' put: 150; 
 		yourself.! !
 
-!CashierTest methodsFor: 'support' stamp: 'MS 6/4/2024 12:22:48'!
+!CashierTest methodsFor: 'support' stamp: 'MS 6/6/2024 12:01:59'!
+expensiveItemList
+
+	^ self expensivePriceList keys! !
+
+!CashierTest methodsFor: 'support' stamp: 'MS 6/6/2024 12:01:45'!
+expensivePriceList
+
+	^ (Dictionary new) 
+		at: 'Un libro muy caro' put: 999999999999999; 
+		at: 'La gota que rebalsó el cajero' put: 10;
+		yourself.! !
+
+!CashierTest methodsFor: 'support' stamp: 'MS 6/6/2024 11:55:59'!
 expiredCreditCard
+	
+	^ CreditCard withOwner: 'Martin Palermo' andNumber: '5258234112539034' andCVV: '472' andExpirationDate: self previousMonthDate.
 
-	| today previousMonth year expirationDate |
-	
-	today := Date today.
-	previousMonth := today monthIndex - 1.
-	year := today year yearNumber.
-	
-	previousMonth = 0
-		ifTrue: [previousMonth  := 12. year := year - 1. ].
-	
-	expirationDate := Date newDay: 1 month: (Date nameOfMonth: previousMonth) year: year.
-	
-	^ (Dictionary new) at: 'number' put: '5258234112539034'; 
-					 at: 'cvv' put: '472';
-					 at: 'expirationDate' put: expirationDate;
-					 yourself.
 	
 ! !
 
-!CashierTest methodsFor: 'support' stamp: 'MS 6/4/2024 11:49:05'!
+!CashierTest methodsFor: 'support' stamp: 'MS 6/6/2024 11:55:59'!
 invalidCreditCardWrongCVVSize
-
-	^ (Dictionary new) at: 'number' put: '5258234112539034'; 
-					 at: 'cvv' put: '472432';
-					 at: 'expirationDate' put: '05/32';
-					 yourself.
-	
+					
+	^ CreditCard withOwner: 'Martin Palermo' andNumber: '5258234112539034' andCVV: '472432' andExpirationDate: self nextMonthDate .
 ! !
 
-!CashierTest methodsFor: 'support' stamp: 'MS 6/4/2024 11:49:00'!
+!CashierTest methodsFor: 'support' stamp: 'MS 6/6/2024 11:57:35'!
+invalidCreditCardWrongNameSize
+					
+	^ CreditCard withOwner: 'Martin Martin Martin Martin Martin Martin Martin Marteeeeeen'  andNumber: '5258234112539034' andCVV: '472' andExpirationDate: self nextMonthDate .
+! !
+
+!CashierTest methodsFor: 'support' stamp: 'MS 6/6/2024 11:55:59'!
 invalidCreditCardWrongNumberSize
 
-	^ (Dictionary new) at: 'number' put: '234112539034'; 
-					 at: 'cvv' put: '472';
-					 at: 'expirationDate' put: '05/32';
-					 yourself.
-	
-! !
+	^ CreditCard withOwner: 'Martin Palermo' andNumber: '525823423423423112539034' andCVV: '472' andExpirationDate: self nextMonthDate.! !
 
-!CashierTest methodsFor: 'support' stamp: 'MS 6/4/2024 12:21:51'!
-validCreditCard
+!CashierTest methodsFor: 'support' stamp: 'MS 6/6/2024 11:27:34'!
+nextMonthDate
 
-	| today nextMonth year expirationDate |
+	| today nextMonth year |
 	
 	today := Date today.
 	nextMonth := today monthIndex + 1.
@@ -311,13 +344,26 @@ validCreditCard
 	nextMonth = 13
 		ifTrue: [nextMonth  := 1. year := year + 1. ].
 	
-	expirationDate := Date newDay: 1 month: (Date nameOfMonth: nextMonth) year: year.
-	
-	^ (Dictionary new) at: 'number' put: '5258234112539034'; 
-					 at: 'cvv' put: '472';
-					 at: 'expirationDate' put: expirationDate;
-					 yourself.
+	^ Date newDay: 1 month: (Date nameOfMonth: nextMonth) year: year! !
 
+!CashierTest methodsFor: 'support' stamp: 'MS 6/6/2024 11:28:14'!
+previousMonthDate
+
+	| today previousMonth year |
+	
+	today := Date today.
+	previousMonth := today monthIndex - 1.
+	year := today year yearNumber.
+	
+	previousMonth = 0
+		ifTrue: [previousMonth  := 12. year := year - 1. ].
+	
+	^ Date newDay: 1 month: (Date nameOfMonth: previousMonth) year: year.! !
+
+!CashierTest methodsFor: 'support' stamp: 'MS 6/6/2024 11:55:59'!
+validCreditCard
+
+	^ CreditCard withOwner: 'Martin Palermo' andNumber: '5258234112539034' andCVV: '472' andExpirationDate: self nextMonthDate.
 	
 ! !
 
@@ -416,15 +462,33 @@ Object subclass: #Cashier
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Cashier methodsFor: 'items' stamp: 'MS 6/4/2024 12:46:10'!
+!Cashier methodsFor: 'items' stamp: 'MS 6/6/2024 12:08:53'!
+assertTransactionAmountLimitIsNotExceeded
+	
+	totalAmount < 1000000000000000
+		ifFalse: [self error: self class transactionAmountLimitExceededErrorMessage.]! !
+
+!Cashier methodsFor: 'items' stamp: 'MS 6/6/2024 12:23:25'!
 checkout
 	
 	cart itemsDo: [:anItem | self addToTotalAmount: anItem ].
+	
+	self assertTransactionAmountLimitIsNotExceeded.
+	
+	" self truncateTotalAmountToKeepTwoDecimals. "
 	
 	(merchant processCard: creditCard for: totalAmount)
 		ifFalse: [self error: self class notEnoughFoundsInCardErrorMessage].
 	
 	^ totalAmount ! !
+
+!Cashier methodsFor: 'items' stamp: 'MS 6/6/2024 12:17:44'!
+truncateTotalAmountToKeepTwoDecimals.
+	
+	totalAmount := totalAmount * 10.
+	totalAmount := totalAmount asFloat.
+	totalAmount truncated.
+	totalAmount := totalAmount / 10.! !
 
 
 !Cashier methodsFor: 'initialization' stamp: 'fb 6/3/2024 22:00:52'!
@@ -447,54 +511,24 @@ initializeForCart: aCart withCreditCard: aCreditCard usingPrices: aPriceList and
 Cashier class
 	instanceVariableNames: ''!
 
-!Cashier class methodsFor: 'instance creation' stamp: 'MS 6/4/2024 11:54:41'!
-assertCVVHasCorrectSize: aCreditCard.
-	
-	^ (aCreditCard at: 'cvv') size = 3
-		ifFalse: [self error: self wrongCreditCardCVVErrorMessage.]
-	 
-		
-		! !
-
 !Cashier class methodsFor: 'instance creation' stamp: 'fb 6/3/2024 21:25:52'!
 assertCartIsNotEmpty: aCart
 
 	aCart isEmpty
 		ifTrue: [self error: self emptyCartErrorMessage]. ! !
 
-!Cashier class methodsFor: 'instance creation' stamp: 'MS 6/4/2024 12:29:45'!
+!Cashier class methodsFor: 'instance creation' stamp: 'MS 6/6/2024 11:20:53'!
 assertIsNotExpired: aCreditCard
 
-	| creditCardExpirationDate |
-	
-	creditCardExpirationDate := aCreditCard at: 'expirationDate'.
-	
-	(creditCardExpirationDate < Date today) | (creditCardExpirationDate = Date today)
+	aCreditCard isExpired
 		ifTrue: [self error: self expiredCardErrorMessage]! !
 
-!Cashier class methodsFor: 'instance creation' stamp: 'MS 6/4/2024 12:24:07'!
-assertIsValidCard: aCreditCard.
-
-	self assertNumberHasCorrectSize: aCreditCard.
-	self assertCVVHasCorrectSize: aCreditCard.
-	
-	self assertIsNotExpired: aCreditCard.
-	 
-		
-		! !
-
-!Cashier class methodsFor: 'instance creation' stamp: 'MS 6/4/2024 11:53:53'!
-assertNumberHasCorrectSize: aCreditCard
-
-	^ (aCreditCard at: 'number') size = 16
-		ifFalse: [self error: self wrongCreditCardNumberErrorMessage.]! !
-
-!Cashier class methodsFor: 'instance creation' stamp: 'MS 6/4/2024 12:36:34'!
+!Cashier class methodsFor: 'instance creation' stamp: 'MS 6/6/2024 11:24:17'!
 forCart: aCart withCreditCard: aCreditCard usingPrices: aPriceList andMerchant: aMerchant
 
 	self assertCartIsNotEmpty: aCart.
-	self assertIsValidCard: aCreditCard.
-
+	self assertIsNotExpired: aCreditCard.
+	
 	^self new initializeForCart: aCart withCreditCard: aCreditCard usingPrices: aPriceList and: aMerchant! !
 
 
@@ -513,15 +547,86 @@ notEnoughFoundsInCardErrorMessage
 
 	^ 'La tarjeta no tiene fondos suficientes'! !
 
-!Cashier class methodsFor: 'error descriptions' stamp: 'MS 6/4/2024 11:53:02'!
+!Cashier class methodsFor: 'error descriptions' stamp: 'MS 6/6/2024 12:05:43'!
+transactionAmountLimitExceededErrorMessage
+
+	^ 'El monto de la transaccion es demasiado grande' ! !
+
+
+!classDefinition: #CreditCard category: #TusLibros!
+Object subclass: #CreditCard
+	instanceVariableNames: 'number cvv expirationDate creditCardNumber cVV owner'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!CreditCard methodsFor: 'initialization' stamp: 'MS 6/6/2024 11:55:44'!
+initializeWithOwner: anOwner andNumber: aCreditCardNumber andCVV: aCVV andExpirationDate: anExpirationDate 
+	
+	owner := anOwner.
+	creditCardNumber := aCreditCardNumber.
+	cVV := aCVV.
+	expirationDate := anExpirationDate.! !
+
+
+!CreditCard methodsFor: 'status' stamp: 'MS 6/6/2024 11:19:18'!
+isExpired
+	
+	^ (expirationDate < Date today) | (expirationDate = Date today)
+! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'CreditCard class' category: #TusLibros!
+CreditCard class
+	instanceVariableNames: ''!
+
+!CreditCard class methodsFor: 'instance creation' stamp: 'MS 6/6/2024 11:55:59'!
+withOwner: anOwner andNumber: aCreditCardNumber andCVV: aCVV andExpirationDate: anExpirationDate 
+	
+	self assertNameHasCorrectSize: anOwner.
+	self assertNumberHasCorrectSize: aCreditCardNumber.
+	self assertCVVHasCorrectSize: aCVV. 
+	
+	^self new initializeWithOwner: anOwner andNumber: aCreditCardNumber andCVV: aCVV andExpirationDate: anExpirationDate ! !
+
+
+!CreditCard class methodsFor: 'assertions' stamp: 'MS 6/6/2024 11:22:47'!
+assertCVVHasCorrectSize: aCreditCardCVV.
+	
+	^ aCreditCardCVV size = 3
+		ifFalse: [self error: self wrongCreditCardCVVErrorMessage.]
+	 
+		
+		! !
+
+!CreditCard class methodsFor: 'assertions' stamp: 'MS 6/6/2024 11:53:45'!
+assertNameHasCorrectSize: anOwner.
+	
+	anOwner size <= 30
+		ifFalse: [self error: self wrongOwnerSizeErrorMessage.]! !
+
+!CreditCard class methodsFor: 'assertions' stamp: 'MS 6/6/2024 11:22:37'!
+assertNumberHasCorrectSize: aCreditCardNumber
+
+	^ aCreditCardNumber size = 16
+		ifFalse: [self error: self wrongCreditCardNumberErrorMessage.]! !
+
+
+!CreditCard class methodsFor: 'error messages' stamp: 'MS 6/6/2024 12:06:02'!
 wrongCreditCardCVVErrorMessage
 	
-	^ 'El codigo de la tarjeta de crédito es incorrecto'! !
+	^ 'El codigo de la tarjeta de credito es incorrecto'! !
 
-!Cashier class methodsFor: 'error descriptions' stamp: 'MS 6/4/2024 11:45:44'!
+!CreditCard class methodsFor: 'error messages' stamp: 'MS 6/6/2024 12:05:56'!
 wrongCreditCardNumberErrorMessage
 	
-	^ 'El numero de la tarjeta de crédito es incorrecto'! !
+	^ 'El numero de la tarjeta de credito es incorrecto'! !
+
+!CreditCard class methodsFor: 'error messages' stamp: 'MS 6/6/2024 11:54:35'!
+wrongOwnerSizeErrorMessage
+
+	^ 'El nombre del dueño es demasiado largo'! !
 
 
 !classDefinition: #MerchantSimulator category: #TusLibros!

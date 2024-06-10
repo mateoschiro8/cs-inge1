@@ -253,14 +253,6 @@ TestCase subclass: #TusLibrosInterfaceTest
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!TusLibrosInterfaceTest methodsFor: 'testing' stamp: 'MS 6/6/2024 21:22:54'!
-authSimulatorAcceptingAllClients
-	
-	^ AuthSimulator acceptingAllClients 
-
-
-	 ! !
-
 !TusLibrosInterfaceTest methodsFor: 'testing' stamp: 'MS 6/6/2024 21:44:48'!
 test01NewCartBeginsEmpty
 
@@ -274,8 +266,8 @@ test01NewCartBeginsEmpty
 	self assert: (tusLibrosInterface listItemsForCart: cartID) isEmpty.
 	 ! !
 
-!TusLibrosInterfaceTest methodsFor: 'testing' stamp: 'MS 6/6/2024 21:46:09'!
-test02CanNotCreateCardForInvalidClient
+!TusLibrosInterfaceTest methodsFor: 'testing' stamp: 'MS 6/10/2024 11:10:57'!
+test02CanNotCreateCartForInvalidClient
 
 	| tusLibrosInterface |
 	
@@ -288,7 +280,7 @@ test02CanNotCreateCardForInvalidClient
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = TusLibrosInterface wrongClientAuthenticationDataErrorMessage. ]! !
 
-!TusLibrosInterfaceTest methodsFor: 'testing' stamp: 'MS 6/9/2024 20:10:14'!
+!TusLibrosInterfaceTest methodsFor: 'testing' stamp: 'MS 6/10/2024 11:15:20'!
 test03AddingItemsToCartListsCorrectly
 
 	| tusLibrosInterface cartID objectFactory anItem |
@@ -306,6 +298,108 @@ test03AddingItemsToCartListsCorrectly
 	
 	self assert: (tusLibrosInterface listItemsForCart: cartID) equals: (OrderedCollection with: anItem with: anItem with: anItem).! !
 
+!TusLibrosInterfaceTest methodsFor: 'testing' stamp: 'MS 6/10/2024 11:24:55'!
+test04CanNotAddItemsToInvalidCartID
+
+	| tusLibrosInterface objectFactory anItem |
+	
+	objectFactory := StoreTestObjectsFactory new.
+	
+	tusLibrosInterface := TusLibrosInterface withClientsAuthenticator: self authSimulatorAcceptingAllClients 
+										andCatalog: objectFactory defaultCatalog.
+	
+	anItem := objectFactory itemSellByTheStore.
+	
+	self 
+		should: [	tusLibrosInterface add: 3 of: anItem toCart: 5. ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = TusLibrosInterface  invalidCartIDErrorMessage. ]! !
+
+!TusLibrosInterfaceTest methodsFor: 'testing' stamp: 'MS 6/10/2024 11:28:30'!
+test05CanNotListItemsToInvalidCartID
+
+	| tusLibrosInterface objectFactory |
+	
+	objectFactory := StoreTestObjectsFactory new.
+	
+	tusLibrosInterface := TusLibrosInterface withClientsAuthenticator: self authSimulatorAcceptingAllClients 
+										andCatalog: objectFactory defaultCatalog.
+	
+	self 
+		should: [tusLibrosInterface listItemsForCart: 5]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = TusLibrosInterface  invalidCartIDErrorMessage. ]! !
+
+!TusLibrosInterfaceTest methodsFor: 'testing' stamp: 'MS 6/10/2024 11:47:05'!
+test06CanNotCheckOutInvalidCartID
+
+	| tusLibrosInterface objectFactory creditCard |
+	
+	objectFactory := StoreTestObjectsFactory new.
+	
+	tusLibrosInterface := TusLibrosInterface withClientsAuthenticator: self authSimulatorAcceptingAllClients 
+										andCatalog: objectFactory defaultCatalog.
+	
+	creditCard := objectFactory notExpiredCreditCard. 
+	
+	self 
+		should: [tusLibrosInterface checkOutCart: 5 withCreditCard: creditCard]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = TusLibrosInterface  invalidCartIDErrorMessage. ]! !
+
+!TusLibrosInterfaceTest methodsFor: 'testing' stamp: 'MS 6/10/2024 12:40:00'!
+test07CheckingOutAddsSaleToClientPurchases
+
+	| tusLibrosInterface objectFactory creditCard anItem cartID sale |
+	
+	objectFactory := StoreTestObjectsFactory new.
+	
+	tusLibrosInterface := TusLibrosInterface withClientsAuthenticator: self authSimulatorAcceptingAllClients 
+										andCatalog: objectFactory defaultCatalog.
+	
+	creditCard := objectFactory notExpiredCreditCard. 
+	cartID := tusLibrosInterface createCartFor: self clientID authenticatingWithPassword: self clientPassword.
+	anItem := objectFactory itemSellByTheStore.
+	
+	tusLibrosInterface add: 3 of: anItem toCart: cartID.
+	
+	sale := tusLibrosInterface checkOutCart: cartID withCreditCard: creditCard.
+	
+	self assert: (tusLibrosInterface listIPurchasesForClient: self clientID) equals: (OrderedCollection with: sale).! !
+
+!TusLibrosInterfaceTest methodsFor: 'testing' stamp: 'MS 6/10/2024 13:05:51'!
+test08CheckingOutDifferentSalesAddsThemToClientPurchases
+
+	| tusLibrosInterface objectFactory creditCard anItem cartID sale1 sale2 |
+	
+	objectFactory := StoreTestObjectsFactory new.
+	
+	tusLibrosInterface := TusLibrosInterface withClientsAuthenticator: self authSimulatorAcceptingAllClients 
+										andCatalog: objectFactory defaultCatalog.
+	
+	creditCard := objectFactory notExpiredCreditCard. 
+	cartID := tusLibrosInterface createCartFor: self clientID authenticatingWithPassword: self clientPassword.
+	anItem := objectFactory itemSellByTheStore.
+	
+	tusLibrosInterface add: 3 of: anItem toCart: cartID.
+	sale1 := tusLibrosInterface checkOutCart: cartID withCreditCard: creditCard.
+	
+	tusLibrosInterface add: 2 of: anItem toCart: cartID.
+	sale2 := tusLibrosInterface checkOutCart: cartID withCreditCard: creditCard.
+	
+	self assert: (tusLibrosInterface listIPurchasesForClient: self clientID) equals: (OrderedCollection with: sale1 with: sale2).! !
+
+
+!TusLibrosInterfaceTest methodsFor: 'support' stamp: 'MS 6/6/2024 21:22:54'!
+authSimulatorAcceptingAllClients
+	
+	^ AuthSimulator acceptingAllClients 
+
+
+	 ! !
 
 !TusLibrosInterfaceTest methodsFor: 'support' stamp: 'MS 6/6/2024 21:13:47'!
 authSimulatorRejectingAllClients
@@ -399,6 +493,12 @@ initializeAcceptingItemsOf: aCatalog
 	items := OrderedCollection new.! !
 
 
+!Cart methodsFor: 'queries' stamp: 'MS 6/10/2024 11:12:06'!
+addItemsToList: itemsList 
+	
+	items do: [:anItem | itemsList add: anItem].
+	! !
+
 !Cart methodsFor: 'queries' stamp: 'HernanWilkinson 6/17/2013 17:45'!
 occurrencesOf: anItem
 
@@ -435,13 +535,6 @@ add: aQuantity of: anItem
 
 	1 to: aQuantity do: [ :aNumber | items add: anItem ]! !
 
-
-!Cart methodsFor: 'as yet unclassified' stamp: 'MS 6/9/2024 20:08:08'!
-addItemsToList: itemsList 
-	
-	items do: [:anItem |itemsList add: anItem].
-	! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Cart class' category: #TusLibros!
@@ -467,10 +560,15 @@ calculateTotal
 	total := cart total.
 	! !
 
-!Cashier methodsFor: 'checkout - private' stamp: 'HernanWilkinson 6/17/2013 19:07'!
+!Cashier methodsFor: 'checkout - private' stamp: 'MS 6/10/2024 11:57:33'!
 createSale
+	
+	| saleItems |
 
-	^ Sale of: total
+	saleItems := OrderedCollection new.
+	cart addItemsToList: saleItems.
+
+	^ Sale of: total withItemsList: saleItems.
 ! !
 
 !Cashier methodsFor: 'checkout - private' stamp: 'HernanWilkinson 6/17/2013 19:06'!
@@ -479,20 +577,25 @@ debitTotal
 	merchantProcessor debit: total from: creditCard.
 	! !
 
-!Cashier methodsFor: 'checkout - private' stamp: 'HernanWilkinson 6/17/2013 19:06'!
+!Cashier methodsFor: 'checkout - private' stamp: 'MS 6/10/2024 12:38:33'!
 registerSale
 
-	salesBook add: self createSale! !
+	| sale |
+
+	sale := self createSale.
+
+	salesBook add: sale.
+	
+	^ sale! !
 
 
-!Cashier methodsFor: 'checkout' stamp: 'HernanWilkinson 6/17/2013 19:06'!
+!Cashier methodsFor: 'checkout' stamp: 'MS 6/10/2024 12:38:50'!
 checkOut
 
 	self calculateTotal.
 	self debitTotal.
-	self registerSale.
 
-	^ total! !
+	^ self registerSale! !
 
 
 !Cashier methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:53'!
@@ -547,7 +650,7 @@ creditCardHasNoCreditErrorMessage
 
 !classDefinition: #CreditCard category: #TusLibros!
 Object subclass: #CreditCard
-	instanceVariableNames: 'expiration'
+	instanceVariableNames: 'expiration number cvv name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -563,21 +666,54 @@ initializeExpiringOn: aMonth
 	
 	expiration := aMonth ! !
 
+!CreditCard methodsFor: 'initialization' stamp: 'MS 6/10/2024 11:43:49'!
+initializeExpiringOn: aMonth withNumber: aCardNumber andCVV: aCVV andName: aName
+	
+	expiration := aMonth.
+	number := aCardNumber.
+	cvv := aCVV.
+	name := aName.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'CreditCard class' category: #TusLibros!
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'instance creation' stamp: 'HernanWilkinson 6/17/2013 18:38'!
-expiringOn: aMonth 
+!CreditCard class methodsFor: 'instance creation' stamp: 'MS 6/10/2024 11:42:36'!
+assertIsValidCVV: aCVV
+
+	aCVV size = 3
+		ifFalse: [self error: self wrongSizeCVVErrorMessage]! !
+
+!CreditCard class methodsFor: 'instance creation' stamp: 'MS 6/10/2024 11:42:14'!
+assertIsValidNumber: aCardNumber
+
+	aCardNumber size = 16
+		ifFalse: [self error: self wrongSizeCardNumberErrorMessage]! !
+
+!CreditCard class methodsFor: 'instance creation' stamp: 'MS 6/10/2024 11:41:36'!
+expiringOn: aMonth withNumber: aCardNumber andCVV: aCVV andName: aName    
 	
-	^self new initializeExpiringOn: aMonth! !
+	self assertIsValidNumber: aCardNumber.
+	self assertIsValidCVV: aCVV.
+	
+	^self new initializeExpiringOn: aMonth withNumber: aCardNumber andCVV: aCVV andName: aName! !
+
+!CreditCard class methodsFor: 'instance creation' stamp: 'MS 6/10/2024 11:43:01'!
+wrongSizeCVVErrorMessage
+
+	^ 'El CVV de la tarjeta es de tamaño incorrecto'! !
+
+!CreditCard class methodsFor: 'instance creation' stamp: 'MS 6/10/2024 11:43:19'!
+wrongSizeCardNumberErrorMessage
+
+	^ 'El numero de la tarjeta es de tamaño incorrecto'! !
 
 
 !classDefinition: #Sale category: #TusLibros!
 Object subclass: #Sale
-	instanceVariableNames: 'total'
+	instanceVariableNames: 'total itemsList'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -588,10 +724,11 @@ total
 	^ total! !
 
 
-!Sale methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:47'!
-initializeTotal: aTotal
+!Sale methodsFor: 'initialization' stamp: 'MS 6/10/2024 11:56:39'!
+initializeTotal: aTotal withItemsList: aListOfItems 
 
-	total := aTotal ! !
+	total := aTotal.
+	itemsList := aListOfItems. ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -599,11 +736,11 @@ initializeTotal: aTotal
 Sale class
 	instanceVariableNames: ''!
 
-!Sale class methodsFor: 'instance creation' stamp: 'HernanWilkinson 6/17/2013 18:47'!
-of: aTotal
+!Sale class methodsFor: 'instance creation' stamp: 'MS 6/10/2024 11:55:31'!
+of: aTotal withItemsList: aListOfItems 
 
 	"should assert total is not negative or 0!!"
-	^self new initializeTotal: aTotal ! !
+	^self new initializeTotal: aTotal withItemsList: aListOfItems  ! !
 
 
 !classDefinition: #StoreTestObjectsFactory category: #TusLibros!
@@ -635,15 +772,15 @@ createCart
 	^Cart acceptingItemsOf: self defaultCatalog! !
 
 
-!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'HernanWilkinson 6/17/2013 18:37'!
+!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'MS 6/10/2024 11:44:54'!
 expiredCreditCard
 	
-	^CreditCard expiringOn: (Month month: today monthIndex year: today yearNumber - 1)! !
+	^CreditCard expiringOn: (Month month: today monthIndex year: today yearNumber - 1) withNumber: '1234123412341234' andCVV: '123' andName: 'Obama'! !
 
-!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'HernanWilkinson 6/17/2013 18:36'!
+!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'MS 6/10/2024 11:44:58'!
 notExpiredCreditCard
 	
-	^CreditCard expiringOn: (Month month: today monthIndex year: today yearNumber + 1)! !
+	^CreditCard expiringOn: (Month month: today monthIndex year: today yearNumber + 1) withNumber: '1234123412341234' andCVV: '123' andName: 'Obama'! !
 
 
 !StoreTestObjectsFactory methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:37'!
@@ -667,52 +804,88 @@ today
 
 !classDefinition: #TusLibrosInterface category: #TusLibros!
 Object subclass: #TusLibrosInterface
-	instanceVariableNames: 'clientsAuthenticator carts objectFactory firstFreeCartID'
+	instanceVariableNames: 'clientsAuthenticator carts objectFactory firstFreeCartID debitBehavior merchantProcessor clientForCart purchases'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!TusLibrosInterface methodsFor: 'cart interface' stamp: 'MS 6/9/2024 20:09:28'!
-add: aQuantity of: anItem toCart: cartID 
+!TusLibrosInterface methodsFor: 'cart interface' stamp: 'MS 6/10/2024 11:29:30'!
+add: aQuantity of: anItem toCart: aCartID 
 
-	(carts at: cartID) add: aQuantity of: anItem! !
+	(carts at: aCartID ifAbsent: [self error: self class invalidCartIDErrorMessage]) 
+		add: aQuantity of: anItem! !
 
-!TusLibrosInterface methodsFor: 'cart interface' stamp: 'MS 6/9/2024 20:05:25'!
+!TusLibrosInterface methodsFor: 'cart interface' stamp: 'MS 6/10/2024 12:31:39'!
 createCartFor: aClientID authenticatingWithPassword: aClientPassword 
 	
-	| newCart |
+	| newCart newCartID |
 	
 	(clientsAuthenticator isValidClient: aClientID withPassword: aClientPassword)
 		ifFalse: [self error: self class wrongClientAuthenticationDataErrorMessage].
 	
 	newCart := objectFactory createCart. 
 	carts at: firstFreeCartID put: newCart. 
+	newCartID := firstFreeCartID.
 	firstFreeCartID := firstFreeCartID + 1.
-		
-	^ firstFreeCartID - 1
+	
+	clientForCart at: newCartID put: aClientID.
+	
+	purchases at: aClientID put: OrderedCollection new. 
+	
+	^ newCartID
 	! !
 
-!TusLibrosInterface methodsFor: 'cart interface' stamp: 'MS 6/9/2024 19:59:24'!
+!TusLibrosInterface methodsFor: 'cart interface' stamp: 'MS 6/10/2024 11:29:22'!
 listItemsForCart: aCartID 
 	
 	| itemsList cart |
 	
 	itemsList := OrderedCollection new.
 	
-	cart := carts at: aCartID.
+	cart := carts at: aCartID ifAbsent: [self error: self class invalidCartIDErrorMessage]. 
 	
 	cart addItemsToList: itemsList.
 	
 	^ itemsList. ! !
 
 
-!TusLibrosInterface methodsFor: 'initialization' stamp: 'MS 6/9/2024 20:06:10'!
+!TusLibrosInterface methodsFor: 'initialization' stamp: 'MS 6/10/2024 12:29:59'!
 initializeWithClientsAuthenticator: aClientsAuthenticator andCatalog: aCatalog  
 	
 	clientsAuthenticator := aClientsAuthenticator.
 	carts := Dictionary new.
+	clientForCart := Dictionary new. 
+	purchases := Dictionary new.
 	objectFactory := StoreTestObjectsFactory new.
-	firstFreeCartID := 1.! !
+	firstFreeCartID := 1.
+	debitBehavior := [ :anAmount :aCreditCard | ].
+	merchantProcessor := self.! !
+
+
+!TusLibrosInterface methodsFor: 'check out' stamp: 'MS 6/10/2024 12:39:22'!
+checkOutCart: aCartID withCreditCard: aCreditCard
+
+	| cart cashier aClientID aClientPurchasesList |
+
+	cart :=	carts at: aCartID ifAbsent: [self error: self class invalidCartIDErrorMessage].
+	
+	aClientID := clientForCart at: aCartID. 
+	aClientPurchasesList := purchases at: aClientID. 
+	
+	cashier := Cashier toCheckout: cart charging: aCreditCard throught: merchantProcessor on: (objectFactory today) registeringOn: aClientPurchasesList.
+	
+	^ cashier checkOut. ! !
+
+
+!TusLibrosInterface methodsFor: 'as yet unclassified' stamp: 'MS 6/10/2024 12:12:50'!
+debit: anAmount from: aCreditCard 
+
+	^debitBehavior value: anAmount value: aCreditCard ! !
+
+!TusLibrosInterface methodsFor: 'as yet unclassified' stamp: 'MS 6/10/2024 12:32:08'!
+listIPurchasesForClient: aClientID
+	
+	^ purchases at: aClientID! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -725,6 +898,11 @@ withClientsAuthenticator: aClientsAuthenticator andCatalog: aCatalog
 
 	^self new initializeWithClientsAuthenticator: aClientsAuthenticator andCatalog: aCatalog! !
 
+
+!TusLibrosInterface class methodsFor: 'error messages' stamp: 'MS 6/10/2024 11:25:27'!
+invalidCartIDErrorMessage
+	
+	^ 'El ID de carrito es invalido'! !
 
 !TusLibrosInterface class methodsFor: 'error messages' stamp: 'MS 6/6/2024 21:27:17'!
 wrongClientAuthenticationDataErrorMessage
